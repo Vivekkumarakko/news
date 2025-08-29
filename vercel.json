@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ],
+  "env": {
+    "SKLEARN_SKIP_CYTHON": "1",
+    "SKLEARN_SKIP_OPENMP": "1",
+    "SKLEARN_SKIP_THREADING": "1"
+  }
+}

@@ -1,0 +1,59 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Set environment variables to avoid Cython compilation
+ENV SKLEARN_SKIP_CYTHON=1
+ENV SKLEARN_SKIP_OPENMP=1
+ENV SKLEARN_SKIP_THREADING=1
+ENV SKLEARN_SKIP_AVX2=1
+ENV SKLEARN_SKIP_AVX512=1
+ENV SKLEARN_SKIP_SSE=1
+ENV SKLEARN_SKIP_NEON=1
+ENV SKLEARN_SKIP_ALTIVEC=1
+ENV SKLEARN_SKIP_VSX=1
+ENV SKLEARN_SKIP_AVX=1
+ENV SKLEARN_SKIP_FMA=1
+ENV SKLEARN_SKIP_SSE2=1
+ENV SKLEARN_SKIP_SSE3=1
+ENV SKLEARN_SKIP_SSSE3=1
+ENV SKLEARN_SKIP_SSE41=1
+ENV SKLEARN_SKIP_SSE42=1
+ENV SKLEARN_SKIP_POPCNT=1
+ENV SKLEARN_SKIP_BMI1=1
+ENV SKLEARN_SKIP_BMI2=1
+ENV SKLEARN_SKIP_LZCNT=1
+ENV SKLEARN_SKIP_F16C=1
+ENV SKLEARN_SKIP_FMA4=1
+ENV SKLEARN_SKIP_XOP=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements-deploy.txt .
+
+# Install Python dependencies with pre-compiled wheels
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements-deploy.txt
+
+# Copy application code
+COPY . .
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
+USER app
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Run the application
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

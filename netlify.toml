@@ -1,5 +1,5 @@
 [build]
-  command = "echo 'Build complete - static site ready'"
+  command = "bash build.sh"
   publish = "."
 
 [[redirects]]
@@ -8,4 +8,28 @@
   status = 200
 
 [build.environment]
-  NODE_VERSION = "18"
+  PYTHON_VERSION = "3.9.18"
+  PIP_VERSION = "21.3.1"
+  SKLEARN_SKIP_CYTHON = "1"
+  SKLEARN_SKIP_OPENMP = "1"
+  SKLEARN_SKIP_THREADING = "1"
+  SKLEARN_SKIP_AVX2 = "1"
+  SKLEARN_SKIP_AVX512 = "1"
+  SKLEARN_SKIP_SSE = "1"
+  SKLEARN_SKIP_NEON = "1"
+  SKLEARN_SKIP_ALTIVEC = "1"
+  SKLEARN_SKIP_VSX = "1"
+  SKLEARN_SKIP_AVX = "1"
+  SKLEARN_SKIP_FMA = "1"
+  SKLEARN_SKIP_SSE2 = "1"
+  SKLEARN_SKIP_SSE3 = "1"
+  SKLEARN_SKIP_SSSE3 = "1"
+  SKLEARN_SKIP_SSE41 = "1"
+  SKLEARN_SKIP_SSE42 = "1"
+  SKLEARN_SKIP_POPCNT = "1"
+  SKLEARN_SKIP_BMI1 = "1"
+  SKLEARN_SKIP_BMI2 = "1"
+  SKLEARN_SKIP_LZCNT = "1"
+  SKLEARN_SKIP_F16C = "1"
+  SKLEARN_SKIP_FMA4 = "1"
+  SKLEARN_SKIP_XOP = "1"
