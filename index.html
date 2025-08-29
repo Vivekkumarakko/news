@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Global Fake News + Reality Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .control-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .control-group input[type="range"] {
+            width: 100%;
+        }
+        
+        .control-group .value-display {
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            margin-top: 5px;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .result-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .result-card p {
+            color: #666;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+        
+        .error {
+            background: #fee;
+            border-left-color: #dc3545;
+            color: #dc3545;
+        }
+        
+        .success {
+            background: #f0f9ff;
+            border-left-color: #28a745;
+        }
+        
+        .api-status {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .api-status.error {
+            background: #fee;
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        
+        .api-status.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Global Fake News + Reality Checker</h1>
+            <p>Detect fake or real news via ML, cross-check with SerpAPI, explain via Gemini AI</p>
+        </div>
+        
+        <div class="main-content">
+            <div id="apiStatus" class="api-status">
+                🔄 Checking API availability...
+            </div>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="newsText">✍️ Paste News Text</label>
+                    <textarea id="newsText" rows="6" placeholder="Enter the news content you want to analyze..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="newsUrl">🔗 News URL (optional)</label>
+                    <input type="url" id="newsUrl" placeholder="https://example.com/news-article">
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <div class="control-group">
+                    <label for="useHeadlines">Use Headlines (SerpAPI)</label>
+                    <input type="checkbox" id="useHeadlines" checked>
+                </div>
+                
+                <div class="control-group">
+                    <label for="useGemini">Use Gemini Explanation</label>
+                    <input type="checkbox" id="useGemini" checked>
+                </div>
+                
+                <div class="control-group">
+                    <label for="abstainMargin">Abstain Margin: <span class="value-display">0.5</span></label>
+                    <input type="range" id="abstainMargin" min="0" max="2" step="0.05" value="0.5">
+                </div>
+                
+                <div class="control-group">
+                    <label for="similarityWeight">Similarity Weight: <span class="value-display">0.5</span></label>
+                    <input type="range" id="similarityWeight" min="0" max="1" step="0.05" value="0.5">
+                </div>
+                
+                <div class="control-group">
+                    <label for="positiveLabel">Positive Label</label>
+                    <select id="positiveLabel">
+                        <option value="REAL">REAL</option>
+                        <option value="FAKE">FAKE</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="probThreshold">Probability Threshold: <span class="value-display">0.60</span></label>
+                    <input type="range" id="probThreshold" min="0" max="1" step="0.01" value="0.60">
+                </div>
+                
+                <div class="control-group">
+                    <label for="disableTranslation">Disable Translation</label>
+                    <input type="checkbox" id="disableTranslation">
+                </div>
+            </div>
+            
+            <button class="analyze-btn" onclick="analyzeNews()" id="analyzeBtn">
+                🔍 Analyze News
+            </button>
+            
+            <div id="loading" class="loading" style="display: none;">
+                🔄 Analyzing news content... Please wait...
+            </div>
+            
+            <div id="results" class="results-section" style="display: none;">
+                <div class="result-card">
+                    <h3>🧠 Prediction</h3>
+                    <p id="prediction">-</p>
+                </div>
+                
+                <div class="result-card">
+                    <h3>📊 Confidence</h3>
+                    <p id="confidence">-</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="apiEndpoint">🔧 API Endpoint</label>
+                    <input type="url" id="apiEndpoint" placeholder="https://your-api-endpoint.com/analyze" value="https://fake-news-detector-api.onrender.com/analyze">
+                </div>
+                
+                <div class="result-card">
+                    <h3>📰 Top Headlines</h3>
+                    <p id="headlines">-</p>
+                </div>
+                
+                <div class="result-card">
+                    <h3>🤖 Gemini Insight</h3>
+                    <p id="geminiInsight">-</p>
+                </div>
+                
+                <div class="result-card">
+                    <h3>🔍 Model Explainability</h3>
+                    <p id="explainability">-</p>
+                </div>
+                
+                <div class="result-card">
+                    <h3>📈 Evidence Similarity</h3>
+                    <p id="similarity">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update value displays for sliders
+        document.getElementById('abstainMargin').addEventListener('input', function() {
+            this.parentElement.querySelector('.value-display').textContent = this.value;
+        });
+        
+        document.getElementById('similarityWeight').addEventListener('input', function() {
+            this.parentElement.querySelector('.value-display').textContent = this.value;
+        });
+        
+        document.getElementById('probThreshold').addEventListener('input', function() {
+            this.parentElement.querySelector('.value-display').textContent = this.value;
+        });
+        
+        // Check API availability on page load
+        window.addEventListener('load', async function() {
+            await checkApiStatus();
+        });
+        
+        async function checkApiStatus() {
+            const statusDiv = document.getElementById('apiStatus');
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+            
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: 'test',
+                        useHeadlines: false,
+                        useGemini: false
+                    })
+                });
+                
+                if (response.ok) {
+                    statusDiv.className = 'api-status success';
+                    statusDiv.textContent = '✅ API is available and ready!';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                statusDiv.className = 'api-status error';
+                statusDiv.innerHTML = `
+                    ⚠️ API not available. Please set up your backend API endpoint above.<br>
+                    <small>You can deploy the Python backend to Railway, Heroku, or Hugging Face Spaces.</small>
+                `;
+            }
+        }
+        
+        async function analyzeNews() {
+            const newsText = document.getElementById('newsText').value.trim();
+            const newsUrl = document.getElementById('newsUrl').value.trim();
+            const apiEndpoint = document.getElementById('apiEndpoint').value.trim();
+            
+            if (!newsText && !newsUrl) {
+                alert('Please enter news text or a URL to analyze.');
+                return;
+            }
+            
+            if (!apiEndpoint) {
+                alert('Please enter a valid API endpoint.');
+                return;
+            }
+            
+            // Show loading state
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('analyzeBtn').disabled = true;
+            
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: newsText,
+                        url: newsUrl,
+                        useHeadlines: document.getElementById('useHeadlines').checked,
+                        useGemini: document.getElementById('useGemini').checked,
+                        margin: parseFloat(document.getElementById('abstainMargin').value),
+                        simWeight: parseFloat(document.getElementById('similarityWeight').value),
+                        positiveLabel: document.getElementById('positiveLabel').value,
+                        probThreshold: parseFloat(document.getElementById('probThreshold').value),
+                        disableTranslation: document.getElementById('disableTranslation').checked
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Display results
+                document.getElementById('prediction').textContent = data.result[0] || 'No prediction available';
+                document.getElementById('confidence').textContent = data.result[1] || 'No confidence data';
+                document.getElementById('headlines').textContent = data.result[2] || 'No headlines available';
+                document.getElementById('geminiInsight').textContent = data.result[3] || 'No Gemini insight available';
+                document.getElementById('explainability').textContent = data.result[4] || 'No explainability data';
+                document.getElementById('similarity').textContent = data.result[5] || 'No similarity data';
+                
+                document.getElementById('results').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error analyzing news: ' + error.message);
+            } finally {
+                // Hide loading state
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('newsText').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                analyzeNews();
+            }
+        });
+    </script>
+</body>
+</html>
