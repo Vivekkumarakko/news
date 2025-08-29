@@ -1,5 +1,5 @@
 [build]
-  command = "bash build.sh"
+  command = "pip install -r requirements.txt && echo 'Build complete - static site ready'"
   publish = "."
 
 [[redirects]]
@@ -8,8 +8,8 @@
   status = 200
 
 [build.environment]
-  PYTHON_VERSION = "3.9.18"
-  PIP_VERSION = "21.3.1"
+  PYTHON_VERSION = "3.11.7"
+  PIP_VERSION = "23.3.1"
   SKLEARN_SKIP_CYTHON = "1"
   SKLEARN_SKIP_OPENMP = "1"
   SKLEARN_SKIP_THREADING = "1"

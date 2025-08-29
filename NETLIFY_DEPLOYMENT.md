@@ -9,9 +9,9 @@ This guide will help you deploy your Fake News Detector to Netlify without Cytho
 2. Click "New site from Git"
 3. Connect your GitHub repository
 4. **Build settings:**
-   - Build command: `bash build.sh`
+   - Build command: `pip install -r requirements.txt && echo 'Build complete - static site ready'`
    - Publish directory: `.`
-   - Python version: `3.9.18`
+   - Python version: `3.11.7`
 5. Click "Deploy site"
 
 ### Option 2: Netlify CLI
@@ -32,8 +32,8 @@ netlify deploy --prod
 Set these in Netlify dashboard → Site settings → Environment variables:
 
 ```bash
-PYTHON_VERSION=3.9.18
-PIP_VERSION=21.3.1
+PYTHON_VERSION=3.11.7
+PIP_VERSION=23.3.1
 SKLEARN_SKIP_CYTHON=1
 SKLEARN_SKIP_OPENMP=1
 SKLEARN_SKIP_THREADING=1
@@ -43,28 +43,27 @@ SKLEARN_SKIP_SSE=1
 ```
 
 ### Build Command
-The build script (`build.sh`) automatically:
-- Sets all necessary environment variables
-- Installs pre-compiled wheels first
-- Falls back to regular requirements if needed
-- Avoids Cython compilation issues
+The simplified build command:
+- Installs Python dependencies directly
+- Uses Python 3.11.7 (widely supported by Netlify)
+- Avoids Cython compilation issues with environment variables
 
 ## 📁 Key Files for Deployment
 
-- `build.sh` - Build script that avoids Cython compilation
-- `requirements-deploy.txt` - Pre-compiled wheel dependencies
+- `requirements.txt` - Python dependencies (Python 3.11 compatible)
 - `netlify.toml` - Netlify configuration
-- `.python-version` - Python version specification
+- `.python-version` - Python version specification (3.11.7)
 - `.netlifyignore` - Files to exclude from build
+- `runtime.txt` - Python runtime specification
 
 ## 🐛 Troubleshooting Cython Issues
 
 ### If you still get Cython errors:
 
-1. **Check Python version**: Ensure you're using Python 3.9.18
+1. **Check Python version**: Ensure you're using Python 3.11.7
 2. **Clear build cache**: In Netlify dashboard → Deploys → Clear cache
-3. **Use pre-compiled wheels**: The `requirements-deploy.txt` should handle this
-4. **Check environment variables**: All SKLEARN_SKIP_* should be set to "1"
+3. **Check environment variables**: All SKLEARN_SKIP_* should be set to "1"
+4. **Verify dependencies**: All packages are Python 3.11 compatible
 
 ### Alternative: Use Vercel
 If Netlify continues to have issues, try Vercel:
@@ -74,20 +73,18 @@ If Netlify continues to have issues, try Vercel:
 
 ## 🔍 Build Process
 
-1. **Environment Setup**: Sets all SKLEARN_SKIP_* variables
-2. **Pip Upgrade**: Updates to latest pip version
-3. **Pre-compiled Wheels**: Tries to install from `requirements-deploy.txt`
-4. **Fallback**: If wheels fail, uses regular `requirements.txt`
-5. **Success**: Build completes without Cython compilation
+1. **Python Setup**: Netlify uses Python 3.11.7
+2. **Dependency Installation**: Installs from requirements.txt
+3. **Environment Variables**: Skip Cython compilation
+4. **Success**: Build completes without compilation issues
 
 ## 📊 Expected Build Output
 
 ```
-🚀 Starting build process...
-📦 Installing Python dependencies...
-🔧 Attempting to install pre-compiled wheels...
-✅ Successfully installed pre-compiled wheels
-✅ Build complete - static site ready!
+Starting to install dependencies
+Installing Python dependencies...
+Successfully installed dependencies
+Build complete - static site ready!
 ```
 
 ## 🎉 Success!
@@ -100,9 +97,16 @@ Once deployed:
 ## 🆘 Still Having Issues?
 
 1. **Check build logs** in Netlify dashboard
-2. **Verify Python version** is 3.9.18
+2. **Verify Python version** is 3.11.7
 3. **Ensure all environment variables** are set
 4. **Try Vercel** as an alternative
 5. **Check model files** are included in the build
 
-Your app is now **Cython-free** and **deployment-ready**! 🚀✨
+## 🔄 What Changed
+
+- **Python Version**: Updated from 3.9.18 to 3.11.7 for better Netlify support
+- **Build Command**: Simplified to direct pip install
+- **Dependencies**: Updated to Python 3.11 compatible versions
+- **Environment**: All SKLEARN_SKIP_* variables still active
+
+Your app is now **Cython-free**, **Python 3.11 compatible**, and **deployment-ready**! 🚀✨
